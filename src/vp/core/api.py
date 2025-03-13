@@ -11,7 +11,7 @@ import invoke
 import requests
 from typer import Typer
 
-from vp.torchrun import REMOTE_WORKING_DIR, SSHConnection, SSHNode, get_result
+from vp.core.torchrun import REMOTE_WORKING_DIR, SSHConnection, SSHNode, get_result
 
 cli = Typer(
     pretty_exceptions_show_locals=False,

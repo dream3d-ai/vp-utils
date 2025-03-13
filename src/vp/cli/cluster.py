@@ -9,8 +9,8 @@ from rich.console import Console
 from rich.table import Table
 from typer import Argument, Option, Typer
 
-from vp.api import MachineType, VPCloud
-from vp.setup import setup_cluster
+from vp.core.api import MachineType, VPCloud
+from vp.core.setup import setup_cluster
 from vp.utils.logging import log_progress, slack_message
 from vp.utils.name import generate_friendly_name
 

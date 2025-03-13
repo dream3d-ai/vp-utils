@@ -10,9 +10,9 @@ from rich.console import Console
 from rich.table import Table
 from typer import Argument, Option, Typer
 
-from vp.api import VPCloud
-from vp.torchrun import SSHConnection, SSHNode, tail_job
-from vp.torchrun import submit as torchrun_submit
+from vp.core.api import VPCloud
+from vp.core.torchrun import SSHConnection, SSHNode, tail_job
+from vp.core.torchrun import submit as torchrun_submit
 from vp.utils.name import generate_friendly_name
 
 cli = Typer(
