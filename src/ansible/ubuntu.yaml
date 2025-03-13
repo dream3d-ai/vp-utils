@@ -1,0 +1,89 @@
+- name: Setup Ubuntu Instances
+  hosts: nodes
+  become: yes
+
+  vars:
+    user_home_directory: "/home/ubuntu"
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Setup SSH
+      become: no
+      block:
+        - name: Copy SSH Key
+          ansible.builtin.copy:
+            src: "{{ lookup('env', 'HOME') }}/.ssh/vp_key"
+            dest: "{{ user_home_directory }}/.ssh/id_rsa"
+            mode: "0600"
+            force: yes
+        - name: Copy SSH Key
+          ansible.builtin.copy:
+            src: "{{ lookup('env', 'HOME') }}/.ssh/vp_key.pub"
+            dest: "{{ user_home_directory }}/.ssh/id_rsa.pub"
+            mode: "0600"
+            force: yes
+        - name: Add SSH Key to SSH Agent
+          ansible.builtin.shell: eval $(ssh-agent) && ssh-add ~/.ssh/id_rsa
+        - name: Disable Strict Host Checking
+          ansible.builtin.copy:
+            content: |
+              Host 10.*
+                StrictHostKeyChecking no
+                UserKnownHostsFile=/dev/null
+            dest: "{{ user_home_directory }}/.ssh/config"
+            mode: "0600"
+            force: yes
+
+    - name: Setup Python
+      block:
+        - name: python-is-python3
+          ansible.builtin.apt:
+            name: python-is-python3
+            state: present
+        - name: python3-pybind11
+          ansible.builtin.apt:
+            name: python3-pybind11
+            state: present
+        - name: Add ~/.local/bin/ to PATH if not present
+          ansible.builtin.lineinfile:
+            path: "{{ user_home_directory }}/.profile"
+            line: 'export PATH="$HOME/.local/bin:$PATH"'
+            state: present
+
+    - name: Install Postgres
+      ansible.builtin.apt:
+        name: libpq-dev
+        state: present
+
+    - name: Install Perf Tools
+      ansible.builtin.apt:
+        name: numactl
+        state: present
+
+    - name: Install ffmpeg
+      ansible.builtin.apt:
+        name: ffmpeg
+        state: present
+
+    - name: Install unzip
+      ansible.builtin.apt:
+        name: unzip
+        state: present
+    
+    - name: Load nvidia_peermem kernel module
+      ansible.builtin.command: modprobe nvidia_peermem
+      become: yes
+
+    - name: Copy ACS disable script
+      ansible.builtin.copy:
+        src: acs_disable.sh
+        dest: /tmp/acs_disable.sh
+        mode: "0755"
+
+    - name: Run ACS disable script
+      ansible.builtin.command:
+        cmd: /tmp/acs_disable.sh
+      become: yes

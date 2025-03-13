@@ -1,0 +1,123 @@
+---
+- name: Install Python Dependencies
+  hosts: nodes
+  become: no
+
+  vars:
+    user_home_directory: "/home/ubuntu"
+
+  tasks:
+    - name: Upgrade pip
+      ansible.builtin.pip:
+        name: pip
+        state: latest
+
+    - name: Install PyTorch cu124
+      ansible.builtin.pip:
+        name:
+          - torch
+          - torchvision
+          - torchao
+          - torchdata
+        state: latest
+
+    - name: Install flash-attention wheel
+      ansible.builtin.pip:
+        name: https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1+cu12torch2.6cxx11abiTRUE-cp310-cp310-linux_x86_64.whl
+
+    - name: Install Python packages
+      ansible.builtin.pip:
+        name:
+          - pylance
+          - requests
+          - urllib3
+          - chardet
+          - diffusers
+          - transformers
+          - lightning
+          - hydra-core
+          - omegaconf
+          - "wandb[media]"
+          - clean-fid
+          - clip-anytorch
+          - einops
+          - opencv-python
+          - pillow
+          - numpy
+          - "torchmetrics[image,multimodal]"
+          - "typer[all]"
+          - iopath
+          - jaxtyping
+          - lpips
+          - dill
+          - sentencepiece
+          - tenacity
+          - setuptools
+          - optuna
+          - optuna-dashboard
+          - ipython
+          - webdataset
+          - torch-submit
+          - s3fs
+          - diskcache
+          - "boto3<1.36.0"
+          - "botocore<1.36.0"
+          - pyarrow
+          - ipython
+          - imageio
+          - pandas
+          - matplotlib
+          - seaborn
+          - mediapy
+          - moviepy==1.0.3
+          - jinja2
+          - "cloudpathlib[s3]"
+          - umap-learn
+          - loguru
+          - torchcodec
+          - asciichartpy
+        state: latest
+
+    - name: Install liger-kernel
+      ansible.builtin.pip:
+        name: liger-kernel
+        state: latest
+        extra_args: --no-deps
+
+    # - name: Install NATTEN
+    #   become: no
+    #   block:
+    #     - name: Add cmake
+    #       become: yes
+    #       ansible.builtin.apt:
+    #         name: cmake
+    #         state: present
+    #     - name: Install pip dependencies
+    #       ansible.builtin.pip:
+    #         name: packaging
+    #         state: latest
+    #     - name: Clone NATTEN
+    #       ansible.builtin.git:
+    #         repo: 'https://github.com/SHI-Labs/NATTEN'
+    #         dest: "{{ user_home_directory }}/NATTEN"
+    #         recursive: yes
+    #     - name: Install NATTEN
+    #       ansible.builtin.shell: |
+    #         cd {{ user_home_directory }}/NATTEN
+    #         make
+
+    # - name: Install Flash Bidirectional Linear Attention
+    #   become: no
+    #   block:
+    #     - name: Clone flash-bidirectional-linear-attention
+    #       ansible.builtin.git:
+    #         repo: 'https://github.com/hp-l33/flash-bidirectional-linear-attention.git'
+    #         dest: "{{ user_home_directory }}/flash-bidirectional-linear-attention"
+    #     - name: Install dependencies
+    #       ansible.builtin.pip:
+    #         name: packaging
+    #         state: latest
+    #     - name: Install package
+    #       ansible.builtin.pip:
+    #         name: "{{ user_home_directory }}/flash-bidirectional-linear-attention"
+    #         editable: yes
